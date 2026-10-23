@@ -27,5 +27,9 @@ def truncate(text: str, width: int) -> str:
         head = text[:budget]  # the cut falls right after a whole word
     else:
         head = re.sub(r"\s*\S*$", "", text[:budget])  # drop the partial word
-    head = head.rstrip().rstrip(",.;:-").rstrip()
-    return (head or text[:budget]) + "…"
+    head = head.rstrip()
+    if not head:
+        return text[:budget] + "…"  # the first word is too long: hard-cut it
+    # Strip trailing punctuation, but keep a whole leading token such as "---" rather
+    # than falling back to the partial word that follows it.
+    return (head.rstrip(",.;:-").rstrip() or head) + "…"

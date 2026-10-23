@@ -55,6 +55,13 @@ def test_truncate_leaves_no_trailing_space_or_punctuation_before_the_ellipsis():
     assert truncate("hello brave  new world", 13) == "hello brave…"
 
 
+def test_truncate_does_not_restore_the_partial_word_when_punctuation_empties_the_prefix():
+    result = truncate("--- hello world", 6)
+    assert result == "---…"
+    assert len(result) <= 6
+    assert truncate("... hello world", 6) == "...…"
+
+
 def test_truncate_width_one_is_just_the_ellipsis():
     assert truncate("hello world", 1) == "…"
 
