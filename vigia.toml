@@ -34,7 +34,7 @@ session_minutes = 30
 
 [checks]
 require_ci = true
-test_command = "python -m pytest -q"
+test_command = "python3 -m pytest -q"
 humans = ["hector14mv"]
 
 [watch]
