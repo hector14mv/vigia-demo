@@ -70,3 +70,15 @@ def test_truncate_width_one_is_just_the_ellipsis():
 def test_truncate_rejects_width_below_one(width):
     with pytest.raises(ValueError):
         truncate("hello", width)
+
+
+def test_slugify_empty_input_is_empty():
+    assert slugify("") == ""
+
+
+def test_slugify_text_without_letters_or_digits_is_empty():
+    assert slugify("!!! ??? ...") == ""
+
+
+def test_slugify_ignores_surrounding_whitespace():
+    assert slugify("  Hello  ") == "hello"
