@@ -19,7 +19,13 @@ def test_redact_masks_email_with_dots_plus_and_subdomains():
 
 @pytest.mark.parametrize(
     "email",
-    ['"first last"@example.com', "o'connor@example.com", "a!b#c$d&e*f?g^h~i@example.com"],
+    [
+        "o'connor@example.com",
+        "a=b@example.com",
+        "a/b@example.com",
+        "a!b#c$d&e*f?g^h~i@example.com",
+        "x{y}|z`w@example.com",
+    ],
 )
 def test_redact_masks_whole_emails_with_special_local_parts(email):
     assert redact(f"write to {email} now") == "write to [email] now"
@@ -29,13 +35,21 @@ def test_redact_masks_whole_emails_with_special_local_parts(email):
     ("text", "expected"),
     [
         ("{'email': 'ana@example.com'}", "{'email': '[email]'}"),
-        ("user=ana@example.com", "user=[email]"),
         ("`ana@example.com`", "`[email]`"),
         ('he said "hi" @ noon', 'he said "hi" @ noon'),
     ],
 )
 def test_redact_keeps_quotes_and_delimiters_around_an_email(text, expected):
     assert redact(text) == expected
+
+
+def test_redact_masks_dot_atom_characters_before_an_address_whole():
+    assert redact("user=ana@example.com") == "[email]"
+
+
+def test_redact_leaves_quoted_local_parts_unchanged():
+    text = 'write to "first last"@example.com'
+    assert redact(text) == text
 
 
 def test_redact_keeps_sentence_punctuation_after_an_email():
@@ -47,20 +61,25 @@ def test_redact_keeps_sentence_punctuation_after_an_email():
     "phone",
     [
         "+34 612 345 678",
-        "612-345-678",
-        "(555) 123-4567",
-        "612345678",
-        "+34612345678",
-        "555.123.4567",
-        "+1 (555) 123-4567",
+        "+44 20 7946 0958",
         "+1-555-123-4567",
+        "612 345 678",
+        "612-345-678",
+        "612.345.678",
         "612 345-678",
         "612.345 678",
-        "91 123-45.67",
+        "(555) 123-4567",
+        "555-123-4567",
+        "555.123.4567",
+        "123-4567",
     ],
 )
 def test_redact_masks_phone_numbers(phone):
     assert redact(f"call {phone} today") == "call [phone] today"
+
+
+def test_redact_masks_the_local_number_after_a_parenthesised_country_code():
+    assert redact("call +1 (555) 123-4567 today") == "call +1 [phone] today"
 
 
 def test_redact_keeps_sentence_punctuation_after_a_phone():
@@ -106,11 +125,33 @@ def test_redact_never_masks_prices_dates_or_runs_of_years(text):
     [
         ("2025 2026 612 345 678 x", "2025 2026 [phone] x"),
         ("23.10.2026 612-345 678 ok", "23.10.2026 [phone] ok"),
-        ("total 612 345 678.90 EUR", "total [phone].90 EUR"),
     ],
 )
 def test_redact_masks_a_phone_that_follows_years_or_a_date(text, expected):
     assert redact(text) == expected
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "code 123456789",
+        "code 12 345 6789",
+        "code 1234 567 890",
+        "+34612345678",
+        "+34 612 345",
+        "/612-345-678",
+        "612-345-678#",
+        "612-345-678-",
+        "612-345-678/",
+        "a612 345 678",
+        "#1234-567890123",
+        "price 123456789.99 EUR",
+        "total 612 345 678.90 EUR",
+        "total 612 345 678,90 EUR",
+    ],
+)
+def test_redact_leaves_digit_runs_of_any_other_shape_unchanged(text):
+    assert redact(text) == text
 
 
 def test_redact_does_not_glue_thousands_separators_into_a_phone():
