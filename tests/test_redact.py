@@ -17,6 +17,27 @@ def test_redact_masks_email_with_dots_plus_and_subdomains():
     assert redact("cc first.last+tag@mail.example.co.uk now") == "cc [email] now"
 
 
+@pytest.mark.parametrize(
+    "email",
+    ['"first last"@example.com', "o'connor@example.com", "a!b#c$d&e*f?g^h~i@example.com"],
+)
+def test_redact_masks_whole_emails_with_special_local_parts(email):
+    assert redact(f"write to {email} now") == "write to [email] now"
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("{'email': 'ana@example.com'}", "{'email': '[email]'}"),
+        ("user=ana@example.com", "user=[email]"),
+        ("`ana@example.com`", "`[email]`"),
+        ('he said "hi" @ noon', 'he said "hi" @ noon'),
+    ],
+)
+def test_redact_keeps_quotes_and_delimiters_around_an_email(text, expected):
+    assert redact(text) == expected
+
+
 def test_redact_keeps_sentence_punctuation_after_an_email():
     assert redact("mail ana@example.com.") == "mail [email]."
     assert redact("<ana@example.com>, bob@example.org") == "<[email]>, [email]"
@@ -33,6 +54,9 @@ def test_redact_keeps_sentence_punctuation_after_an_email():
         "555.123.4567",
         "+1 (555) 123-4567",
         "+1-555-123-4567",
+        "612 345-678",
+        "612.345 678",
+        "91 123-45.67",
     ],
 )
 def test_redact_masks_phone_numbers(phone):
@@ -61,6 +85,32 @@ def test_redact_does_not_glue_a_date_and_time_into_a_phone():
 
 def test_redact_masks_a_phone_that_follows_a_date():
     assert redact("2026-10-23 612 345 678 called") == "2026-10-23 [phone] called"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "price 1234567.89 EUR",
+        "price 1 234 567.89 EUR",
+        "In 2025 2026 2027 we grew",
+        "seasons 2019-2020-2021-2022 done",
+        "23.10.2026 12:30 job done",
+    ],
+)
+def test_redact_never_masks_prices_dates_or_runs_of_years(text):
+    assert redact(text) == text
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("2025 2026 612 345 678 x", "2025 2026 [phone] x"),
+        ("23.10.2026 612-345 678 ok", "23.10.2026 [phone] ok"),
+        ("total 612 345 678.90 EUR", "total [phone].90 EUR"),
+    ],
+)
+def test_redact_masks_a_phone_that_follows_years_or_a_date(text, expected):
+    assert redact(text) == expected
 
 
 def test_redact_does_not_glue_thousands_separators_into_a_phone():
