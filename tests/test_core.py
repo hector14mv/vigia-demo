@@ -72,6 +72,18 @@ def test_truncate_rejects_width_below_one(width):
         truncate("hello", width)
 
 
+def test_truncate_text_exactly_at_the_width_is_unchanged():
+    assert truncate("hello", 5) == "hello"
+
+
+def test_truncate_empty_text_is_empty():
+    assert truncate("", 3) == ""
+
+
+def test_truncate_cuts_at_a_word_boundary_when_the_ellipsis_fills_the_width():
+    assert truncate("hello world", 6) == "hello…"
+
+
 def test_slugify_empty_input_is_empty():
     assert slugify("") == ""
 
