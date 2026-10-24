@@ -50,3 +50,14 @@ def test_characters_without_a_decomposition_are_left_alone():
     assert strip_accents("ø") == "ø"
     assert strip_accents("đ") == "đ"
     assert strip_accents("straße") == "straße"
+
+
+def test_characters_with_a_canonical_equivalent_but_no_diacritic_are_unchanged():
+    # NFD rewrites these to a different code point even though no diacritic is involved.
+    kelvin, ohm, hangul = "\u212a", "\u2126", "\ud55c"  # KELVIN SIGN, OHM SIGN, Hangul syllable
+    for text in (kelvin, ohm, hangul, f"{kelvin} {ohm}", f"{kelvin}{ohm} 한국어"):
+        assert strip_accents(text) == text
+
+
+def test_symbol_with_a_diacritic_in_its_decomposition_is_still_stripped():
+    assert strip_accents("\u212b") == "A"  # ANGSTROM SIGN -> A + ring above
