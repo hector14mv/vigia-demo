@@ -9,7 +9,7 @@ comment on each one are the whole story.
 
 ## Functions
 
-Import from the module, or, for the first four, straight from `textkit`.
+Import from the module, or straight from `textkit`.
 
 | Function | What it does | Import |
 | --- | --- | --- |
@@ -21,8 +21,8 @@ Import from the module, or, for the first four, straight from `textkit`.
 | `reading_time` | Whole minutes the text takes to read at `wpm` words per minute, rounded up. | `from textkit.reading import reading_time` |
 | `title_case` | Capitalises each word, keeping the joining words lowercase unless first. | `from textkit.titlecase import title_case` |
 
-`slugify`, `word_count`, `truncate` and `format_eur` also work as `from textkit import slugify, word_count, truncate, format_eur`.
-`strip_accents`, `reading_time` and `title_case` are importable only from their module.
+All seven functions import straight from `textkit`: `from textkit import slugify, word_count, truncate, format_eur, strip_accents, reading_time, title_case`.
+Each one also imports from its own module, as the table shows.
 
 ```bash
 python -m pytest
