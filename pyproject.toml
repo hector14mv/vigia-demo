@@ -3,6 +3,10 @@ name = "textkit"
 version = "0.1.0"
 description = "A tiny text utility library, built by vigia's agents."
 requires-python = ">=3.11"
+license = { text = "MIT" }
+
+[project.urls]
+Repository = "https://github.com/hector14mv/vigia-demo"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
