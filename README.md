@@ -7,6 +7,23 @@ commit by a model from a different AI lab, and merged by `vigia watch`, a Python
 not call any model. Read the issues, then the pull requests: the handoff, the review and the merge
 comment on each one are the whole story.
 
+## Functions
+
+Import from the module, or, for the first four, straight from `textkit`.
+
+| Function | What it does | Import |
+| --- | --- | --- |
+| `slugify` | Lowercases text and joins its words with hyphens. | `from textkit.core import slugify` |
+| `word_count` | How many words the text has, splitting on whitespace. | `from textkit.core import word_count` |
+| `truncate` | Shortens text to at most `width` characters on a word boundary, ending with "…". | `from textkit.core import truncate` |
+| `format_eur` | Formats an integer amount of euro cents as Spanish invoice text. | `from textkit.money import format_eur` |
+| `strip_accents` | Removes diacritics from text. | `from textkit.accents import strip_accents` |
+| `reading_time` | Whole minutes the text takes to read at `wpm` words per minute, rounded up. | `from textkit.reading import reading_time` |
+| `title_case` | Capitalises each word, keeping the joining words lowercase unless first. | `from textkit.titlecase import title_case` |
+
+`slugify`, `word_count`, `truncate` and `format_eur` also work as `from textkit import slugify, word_count, truncate, format_eur`.
+`strip_accents`, `reading_time` and `title_case` are importable only from their module.
+
 ```bash
 python -m pytest
 ```
